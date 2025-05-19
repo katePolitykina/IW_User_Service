@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: changeset/v1/v1-accumulate-changelog.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changeset/v2/v2-accumulate-changelog.yaml
+      relativeToChangelogFile: true

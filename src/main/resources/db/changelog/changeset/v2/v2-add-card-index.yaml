@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-card-index
+      author: katapalk
+      changes:
+        - createIndex:
+            indexName: idx_card_info_user_id
+            tableName: card_info
+            columns:
+              - column:
+                  name: user_id

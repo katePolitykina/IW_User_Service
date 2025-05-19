@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-card-info
+      author: katapalk
+      changes:
+        - createTable:
+            tableName: card_info
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: card_info_user_id_fkey
+                    referencedTableName: users
+                    referencedColumnNames: id
+
+              - column:
+                  name: number
+                  type: bytea
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: holder
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: expiration_date
+                  type: date
+                  constraints:
+                    nullable: false
