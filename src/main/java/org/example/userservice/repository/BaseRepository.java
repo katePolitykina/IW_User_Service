@@ -13,4 +13,8 @@ public interface BaseRepository<T> extends JpaRepository<T, Long> {
     @Query("SELECT t FROM #{#entityName} t WHERE t.id IN :ids")
     Stream<T> getByIds(@Param("ids") Collection<Long> ids);
 
+    default Optional<T> update(T input){
+        return Optional.of(save(input));
+    }
+
 }

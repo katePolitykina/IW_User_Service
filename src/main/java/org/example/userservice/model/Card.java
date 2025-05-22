@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.hibernate.mapping.List;
 
 import java.time.LocalDate;
 
@@ -31,7 +30,5 @@ public class Card {
 
     @Column(name = "expiration_date", nullable = false)
     private LocalDate expirationDate;
-
-
 
 }

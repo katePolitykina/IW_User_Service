@@ -1,4 +1,0 @@
-databaseChangeLog:
-  - include:
-      file: v2-add-card-index.yaml
-      relativeToChangelogFile: true
