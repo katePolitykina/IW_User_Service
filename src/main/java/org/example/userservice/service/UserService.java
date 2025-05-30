@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import org.example.userservice.dto.UserTO.UserRequestTO;
 import org.example.userservice.dto.UserTO.UserResponseTO;
 import org.example.userservice.dto.UserTO.UserUpdateTO;
+import org.example.userservice.exception.BadRequestException;
 import org.example.userservice.exception.EntityNotFoundException;
+import org.example.userservice.exception.UserAlreadyExistsExeption;
 import org.example.userservice.mapper.UserMapper;
 import org.example.userservice.model.User;
 import org.example.userservice.repository.UserRepository;
@@ -34,18 +36,22 @@ public class UserService {
                 .toList();
     }
 
-    public UserResponseTO get(String email) {
+    public UserResponseTO getByEmail(String email) {
         return userRepository
                 .findUserByEmail(email)
                 .map(userMapper::toUserResponseTo)
                 .orElseThrow(()-> new EntityNotFoundException("User with email " + email + " not found"));
     }
-//TODO: add exeptions
-    public UserResponseTO create(UserRequestTO input) {
 
-        User savedUser = userRepository.save(userMapper.toUser(input));
+    public UserResponseTO create(UserRequestTO input) {
+        if (userRepository.existsByEmail(input.getEmail())) {
+            throw new UserAlreadyExistsExeption("User with email " + input.getEmail() + " already exists");
+        }
+        User user = userMapper.toUser(input);
+        User savedUser = userRepository.save(user);
         return userMapper.toUserResponseTo(savedUser);
     }
+
     @Transactional
     public void delete(Long id) {
         if (userRepository.existsById(id)) {
@@ -58,7 +64,9 @@ public class UserService {
     public UserResponseTO update(UserUpdateTO input) {
         User user = userRepository.findById(input.getId())
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + input.getId() + " not found"));
-
+        if (userRepository.existsByEmailAndIdNot(input.getEmail(), input.getId())) {
+            throw new BadRequestException("Email '" + input.getEmail() + "' is already in use.");
+        }
         userMapper.updateUserFromDto(input, user);
 
         User updatedUser = userRepository.save(user);

@@ -52,20 +52,4 @@ public class CardService {
         }
     }
 
-    @Transactional
-    public CardResponseTO update(Long id, CardRequestTO input) {
-        Card card = cardMapper.toCard(input);
-
-        User user = userRepository.findById(input.getUserId())
-                .orElseThrow(() -> new EntityNotFoundException("User with id " + input.getUserId() + " not found"));
-
-        card.setUser(user);
-
-        return cardRepository
-                .update(card)
-                .map(cardMapper::toCardResponseTo)
-                .orElseThrow();
-
-    }
-
 }
