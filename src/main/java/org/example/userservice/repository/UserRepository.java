@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface UserRepo extends BaseRepository<User> {
+public interface UserRepository extends BaseRepository<User> {
     @Query(value = "SELECT * FROM users WHERE email = :email", nativeQuery = true)
     Optional<User> findUserByEmail(@Param("email") String email);
 

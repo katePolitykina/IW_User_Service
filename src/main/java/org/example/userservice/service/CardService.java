@@ -9,45 +9,44 @@ import org.example.userservice.exception.EntityNotFoundException;
 import org.example.userservice.mapper.CardMapper;
 import org.example.userservice.model.Card;
 import org.example.userservice.model.User;
-import org.example.userservice.repository.CardRepo;
-import org.example.userservice.repository.UserRepo;
+import org.example.userservice.repository.CardRepository;
+import org.example.userservice.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import javax.management.BadAttributeValueExpException;
 import java.util.List;
 
 @AllArgsConstructor
 @Service
 public class CardService {
-    private final CardRepo cardRepo;
+    private final CardRepository cardRepository;
     private final CardMapper cardMapper;
-    private final UserRepo userRepo;
+    private final UserRepository userRepository;
 
-    public CardResponseTO get(Long id) {
-        return cardRepo
+    public CardResponseTO getById(Long id) {
+        return cardRepository
                 .findById(id)
                 .map(cardMapper::toCardResponseTo)
                 .orElseThrow(() -> new EntityNotFoundException("Card with id " + id + " not found"));
     }
 
-    public List<CardResponseTO> get(List<Long> ids) {
-        return cardRepo
+    public List<CardResponseTO> getByIds(List<Long> ids) {
+        return cardRepository
                 .getByIds(ids)
                 .map(cardMapper::toCardResponseTo)
                 .toList();
     }
 
     public CardResponseTO create(CardRequestTO input) {
-        if (userRepo.existsById(input.getUserId())) {
-            return cardMapper.toCardResponseTo(cardRepo.save(cardMapper.toCard(input)));
+        if (userRepository.existsById(input.getUserId())) {
+            return cardMapper.toCardResponseTo(cardRepository.save(cardMapper.toCard(input)));
         }else {
             throw new BadRequestException("User with id " + input.getUserId() + " does not exist");
         }
     }
     @Transactional
     public void delete(Long id) {
-        if(cardRepo.existsById(id)) {
-            cardRepo.deleteById(id);
+        if(cardRepository.existsById(id)) {
+            cardRepository.deleteById(id);
         }else {
             throw new EntityNotFoundException("Card with id " + id + " not found");
         }
@@ -57,12 +56,12 @@ public class CardService {
     public CardResponseTO update(Long id, CardRequestTO input) {
         Card card = cardMapper.toCard(input);
 
-        User user = userRepo.findById(input.getUserId())
+        User user = userRepository.findById(input.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + input.getUserId() + " not found"));
 
         card.setUser(user);
 
-        return cardRepo
+        return cardRepository
                 .update(card)
                 .map(cardMapper::toCardResponseTo)
                 .orElseThrow();
