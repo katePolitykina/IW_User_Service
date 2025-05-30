@@ -5,6 +5,7 @@ import org.example.userservice.dto.UserTO.UserUpdateTO;
 import org.example.userservice.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper  {
@@ -15,4 +16,9 @@ public interface UserMapper  {
 
     @Mapping(target = "cards", ignore = true)
     User toUser(UserUpdateTO userUpdateTO);
+
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "cards", ignore = true)
+    void updateUserFromDto(UserUpdateTO dto, @MappingTarget User entity);
 }
