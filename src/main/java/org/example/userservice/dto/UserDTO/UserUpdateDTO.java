@@ -1,14 +1,13 @@
-package org.example.userservice.dto.UserTO;
+package org.example.userservice.dto.UserDTO;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import lombok.Data;
-
 import java.time.LocalDate;
 
 @Data
-public class UserUpdateTO {
+public class UserUpdateDTO {
     @NotNull
     private Long id;
 

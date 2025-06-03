@@ -1,24 +1,25 @@
 package org.example.userservice.mapper;
-import org.example.userservice.dto.UserTO.UserRequestTO;
-import org.example.userservice.dto.UserTO.UserResponseTO;
-import org.example.userservice.dto.UserTO.UserUpdateTO;
+
+import org.example.userservice.dto.UserDTO.UserRequestDTO;
+import org.example.userservice.dto.UserDTO.UserResponseDTO;
+import org.example.userservice.dto.UserDTO.UserUpdateDTO;
 import org.example.userservice.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
-public interface UserMapper  {
-    UserResponseTO toUserResponseTo(User user);
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "cards", ignore = true)
-    User toUser(UserRequestTO userRequestTo);
-
-    @Mapping(target = "cards", ignore = true)
-    User toUser(UserUpdateTO userUpdateTO);
-
+public interface UserMapper {
+    UserResponseDTO toUserResponseTo(User user);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "cards", ignore = true)
-    void updateUserFromDto(UserUpdateTO dto, @MappingTarget User entity);
+    User toUser(UserRequestDTO userRequestDTO);
+
+    @Mapping(target = "cards", ignore = true)
+    User toUser(UserUpdateDTO userUpdateDTO);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "cards", ignore = true)
+    void updateUserFromDto(UserUpdateDTO dto, @MappingTarget User entity);
 }

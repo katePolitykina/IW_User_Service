@@ -1,23 +1,22 @@
 package org.example.userservice.mapper;
 
-import org.example.userservice.dto.CardTO.CardRequestTO;
-import org.example.userservice.dto.CardTO.CardResponseTO;
+import org.example.userservice.dto.CardDTO.CardRequestDTO;
+import org.example.userservice.dto.CardDTO.CardResponseDTO;
 import org.example.userservice.model.Card;
 import org.example.userservice.utils.EncryptionUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring")
-public abstract class  CardMapper  {
+public abstract class CardMapper {
     @Autowired
     protected EncryptionUtil encryptionService;
 
     @Mapping(source = "user.id", target = "userId")
-    public abstract CardResponseTO toCardResponseTo(Card card);
+    public abstract CardResponseDTO toCardResponseTo(Card card);
 
-    public abstract Card toCard(CardRequestTO cardRequestTo);
+    public abstract Card toCard(CardRequestDTO cardRequestDTO);
 
     protected String map(byte[] value) {
         return encryptionService.decrypt(value);

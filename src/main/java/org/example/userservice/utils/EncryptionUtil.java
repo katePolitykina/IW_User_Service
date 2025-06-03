@@ -2,7 +2,6 @@ package org.example.userservice.utils;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;

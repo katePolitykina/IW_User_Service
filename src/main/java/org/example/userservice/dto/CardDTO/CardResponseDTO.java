@@ -1,10 +1,9 @@
-package org.example.userservice.dto.CardTO;
+package org.example.userservice.dto.CardDTO;
 
 import lombok.Data;
-
 import java.time.LocalDate;
 @Data
-public class CardResponseTO {
+public class CardResponseDTO {
     private Long id;
     private String number;
     private Long userId;

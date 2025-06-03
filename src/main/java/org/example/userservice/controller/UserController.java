@@ -5,9 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
-import org.example.userservice.dto.UserTO.UserRequestTO;
-import org.example.userservice.dto.UserTO.UserResponseTO;
-import org.example.userservice.dto.UserTO.UserUpdateTO;
+import org.example.userservice.dto.UserDTO.UserRequestDTO;
+import org.example.userservice.dto.UserDTO.UserResponseDTO;
+import org.example.userservice.dto.UserDTO.UserUpdateDTO;
 import org.example.userservice.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -22,34 +22,34 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/{id}")
-    public UserResponseTO getById(@PathVariable Long id) {
+    public UserResponseDTO getById(@PathVariable Long id) {
         return userService.getById(id);
     }
 
-    @PostMapping("/by-ids")
-    public List<UserResponseTO> getByIds(@RequestBody  @Valid @Size(min = 1) List<@NotNull Long> ids) {
+    @GetMapping
+    public List<UserResponseDTO> getByIds(@RequestParam @Size(min = 1) List<@NotNull Long> ids) {
         return userService.getByIds(ids);
     }
 
     @GetMapping("/by-email")
-    public UserResponseTO getByEmail(@RequestParam @NotBlank String email) {
+    public UserResponseDTO getByEmail(@RequestParam @NotBlank String email) {
         return userService.getByEmail(email);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserResponseTO create(@RequestBody @Valid UserRequestTO input) {
-        return  userService.create(input);
+    public UserResponseDTO create(@RequestBody @Valid UserRequestDTO input) {
+        return userService.create(input);
 
     }
 
     @PutMapping
-    public UserResponseTO update(@RequestBody @Valid UserUpdateTO input) {
+    public UserResponseDTO update(@RequestBody @Valid UserUpdateDTO input) {
         return userService.update(input);
     }
 
     @DeleteMapping("/{id}")
-    public void delete (@PathVariable Long id) {
+    public void delete(@PathVariable Long id) {
         userService.delete(id);
     }
 }

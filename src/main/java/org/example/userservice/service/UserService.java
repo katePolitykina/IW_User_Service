@@ -2,9 +2,9 @@ package org.example.userservice.service;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import org.example.userservice.dto.UserTO.UserRequestTO;
-import org.example.userservice.dto.UserTO.UserResponseTO;
-import org.example.userservice.dto.UserTO.UserUpdateTO;
+import org.example.userservice.dto.UserDTO.UserRequestDTO;
+import org.example.userservice.dto.UserDTO.UserResponseDTO;
+import org.example.userservice.dto.UserDTO.UserUpdateDTO;
 import org.example.userservice.exception.BadRequestException;
 import org.example.userservice.exception.EntityNotFoundException;
 import org.example.userservice.exception.UserAlreadyExistsExeption;
@@ -22,28 +22,28 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public UserResponseTO getById(Long id) {
+    public UserResponseDTO getById(Long id) {
         return userRepository
                 .findById(id)
                 .map(userMapper::toUserResponseTo)
-                .orElseThrow(()-> new EntityNotFoundException("User with id " + id + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
     }
 
-    public List<UserResponseTO> getByIds(List<Long> ids) {
+    public List<UserResponseDTO> getByIds(List<Long> ids) {
         return userRepository
                 .getByIds(ids)
                 .map(userMapper::toUserResponseTo)
                 .toList();
     }
 
-    public UserResponseTO getByEmail(String email) {
+    public UserResponseDTO getByEmail(String email) {
         return userRepository
                 .findUserByEmail(email)
                 .map(userMapper::toUserResponseTo)
-                .orElseThrow(()-> new EntityNotFoundException("User with email " + email + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User with email " + email + " not found"));
     }
 
-    public UserResponseTO create(UserRequestTO input) {
+    public UserResponseDTO create(UserRequestDTO input) {
         if (userRepository.existsByEmail(input.getEmail())) {
             throw new UserAlreadyExistsExeption("User with email " + input.getEmail() + " already exists");
         }
@@ -60,8 +60,9 @@ public class UserService {
             throw new EntityNotFoundException("User with id " + id + " not found");
         }
     }
+
     @Transactional
-    public UserResponseTO update(UserUpdateTO input) {
+    public UserResponseDTO update(UserUpdateDTO input) {
         User user = userRepository.findById(input.getId())
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + input.getId() + " not found"));
         if (userRepository.existsByEmailAndIdNot(input.getEmail(), input.getId())) {
@@ -72,8 +73,6 @@ public class UserService {
         User updatedUser = userRepository.save(user);
         return userMapper.toUserResponseTo(updatedUser);
     }
-
-
 
 
 }
