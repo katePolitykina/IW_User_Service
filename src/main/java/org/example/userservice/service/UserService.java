@@ -11,6 +11,9 @@ import org.example.userservice.exception.UserAlreadyExistsExeption;
 import org.example.userservice.mapper.UserMapper;
 import org.example.userservice.model.User;
 import org.example.userservice.repository.UserRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +24,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-
+    @Cacheable(value = "userWithCards", key = "#id")
     public UserResponseDTO getById(Long id) {
         return userRepository
                 .findById(id)
@@ -43,6 +46,7 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User with email " + email + " not found"));
     }
 
+    @CacheEvict(value = "userWithCards", key = "#result.id")
     public UserResponseDTO create(UserRequestDTO input) {
         if (userRepository.existsByEmail(input.getEmail())) {
             throw new UserAlreadyExistsExeption("User with email " + input.getEmail() + " already exists");
@@ -51,7 +55,7 @@ public class UserService {
         User savedUser = userRepository.save(user);
         return userMapper.toUserResponseTo(savedUser);
     }
-
+    @CacheEvict(value = "userWithCards", key = "#id")
     @Transactional
     public void delete(Long id) {
         if (userRepository.existsById(id)) {
@@ -60,7 +64,7 @@ public class UserService {
             throw new EntityNotFoundException("User with id " + id + " not found");
         }
     }
-
+    @CacheEvict(value = "userWithCards", key = "#input.id")
     @Transactional
     public UserResponseDTO update(UserUpdateDTO input) {
         User user = userRepository.findById(input.getId())
