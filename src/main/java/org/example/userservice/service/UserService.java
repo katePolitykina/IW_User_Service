@@ -70,7 +70,7 @@ public class UserService {
         User user = userRepository.findById(input.getId())
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + input.getId() + " not found"));
         if (userRepository.existsByEmailAndIdNot(input.getEmail(), input.getId())) {
-            throw new BadRequestException("Email '" + input.getEmail() + "' is already in use.");
+            throw new BadRequestException("Email \"" + input.getEmail() + "\" is already in use.");
         }
         userMapper.updateUserFromDto(input, user);
 
