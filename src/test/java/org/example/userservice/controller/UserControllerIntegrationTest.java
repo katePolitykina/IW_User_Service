@@ -32,7 +32,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -41,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -49,7 +50,7 @@ import java.util.List;
         "ENCRYPTION_KEY=test-key"
 })
 @Import(RedisConfiguration.class)
-class UserControllerTest {
+class UserControllerIntegrationTest {
     private static ObjectMapper objectMapper = new ObjectMapper()
                .registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -84,9 +85,6 @@ class UserControllerTest {
 
     }
 
-
-
-
     @BeforeEach
     void setUp() {
         userRepository.deleteAll();
@@ -95,6 +93,7 @@ class UserControllerTest {
             cache.clear();
         }
     }
+
 
     @Nested
     class GetUserByIdTest {
@@ -108,9 +107,14 @@ class UserControllerTest {
                     .andExpect(jsonPath("$.email").value(testUser.getEmail()))
                     .andExpect(jsonPath("$.name").value(testUser.getName()))
                     .andExpect(jsonPath("$.surname").value(testUser.getSurname()));
+            var oldUsername = testUser.getName();
+            testUser.setName("Hacker");
+            userRepository.save(testUser);
+
             mockMvc.perform(get(BASE_URL + "/{id}", testUser.getId())
                             .contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk());
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.name").value(oldUsername));
         }
 
         @Test
@@ -253,6 +257,29 @@ class UserControllerTest {
         }
 
         @Test
+        void update_ShouldEvictCache() throws Exception {
+
+            User user = generateTestUsersToDB(1).get(0);
+
+            mockMvc.perform(get(BASE_URL + "/" + user.getId()))
+                    .andExpect(status().isOk());
+
+            Cache cache = cacheManager.getCache("userWithCards");
+            assertNotNull(cache.get(user.getId()));
+
+            UserUpdateDTO dto = userMapper.toUserUpdateDTO(user);
+            dto.setName("Updated Name");
+
+            mockMvc.perform(put(BASE_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(dto)))
+                    .andExpect(status().isOk());
+
+            assertNull(cache.get(user.getId()));
+        }
+
+
+        @Test
         void update_ReturnsNotFound_WhenUserDoesNotExist() throws Exception {
             var id = 1L;
             UserUpdateDTO dto = new UserUpdateDTO(id, "Ghost", "User", LocalDate.of(1990, 1, 1), "ghost@example.com");
@@ -301,6 +328,20 @@ class UserControllerTest {
 
             assertFalse(userRepository.existsById(savedUser.getId()));
         }
+        @Test
+        void delete_ShouldEvictCache() throws Exception {
+            User user = generateTestUsersToDB(1).get(0);
+
+            mockMvc.perform(get(BASE_URL + "/" + user.getId()))
+                    .andExpect(status().isOk());
+            Cache cache = cacheManager.getCache("userWithCards");
+            assertNotNull(cache.get(user.getId()));
+
+            mockMvc.perform(delete(BASE_URL + "/" + user.getId()))
+                    .andExpect(status().isOk());
+
+            assertNull(cache.get(user.getId()));
+        }
 
         @Test
         void delete_ReturnsNotFound_WhenUserDoesNotExist() throws Exception {
@@ -318,7 +359,7 @@ class UserControllerTest {
         for (int i = 0; i < count; i++) {
             User user = new User();
 
-            user.setEmail("user" + i + "@example.com");
+            user.setEmail("user" + i +"_" + UUID.randomUUID()+ "@example.com");
             user.setName("User" + i);
             user.setSurname("TestSurname");
             user.setBirthDate(LocalDate.now().minusYears(20 + i));

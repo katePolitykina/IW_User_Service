@@ -7,6 +7,8 @@ import org.example.userservice.dto.CardDTO.CardResponseDTO;
 import org.example.userservice.exception.BadRequestException;
 import org.example.userservice.exception.EntityNotFoundException;
 import org.example.userservice.mapper.CardMapper;
+import org.example.userservice.model.Card;
+import org.example.userservice.model.User;
 import org.example.userservice.repository.CardRepository;
 import org.example.userservice.repository.UserRepository;
 import org.springframework.cache.CacheManager;
@@ -40,11 +42,12 @@ public class CardService {
 
     @CacheEvict(value = "userWithCards", key = "#input.userId")
     public CardResponseDTO create(CardRequestDTO input) {
-        if (userRepository.existsById(input.getUserId())) {
-            return cardMapper.toCardResponseTo(cardRepository.save(cardMapper.toCard(input)));
-        } else {
-            throw new BadRequestException("User with id " + input.getUserId() + " does not exist");
-        }
+        User user = userRepository.findById(input.getUserId())
+                .orElseThrow(() -> new BadRequestException("User with id " + input.getUserId() + " does not exist"));
+        Card card = cardMapper.toCard(input);
+        card.setUser(user);
+        Card savedCard = cardRepository.save(card);
+        return cardMapper.toCardResponseTo(savedCard);
     }
 
     @Transactional
