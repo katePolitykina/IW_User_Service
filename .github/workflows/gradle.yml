@@ -14,6 +14,21 @@ on:
     branches: [ "main" ]
 
 jobs:
+  SonarCloudScan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+            fetch-depth: 0
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.organiation=katepolitykina
+            -Dsonar.projectKey=iw_user_service
   build:
 
     runs-on: ubuntu-latest
@@ -38,17 +53,6 @@ jobs:
 
     - name: Run tests
       run: ./gradlew test --console=plain --info
-
-    - name: SonarQube Scan
-      uses: sonarsource/sonarqube-scan-action@v1 
-      with:
-        projectBaseDir: .
-        args: >
-          -Dsonar.projectKey=iw-userservice
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-    
 
 
     # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
