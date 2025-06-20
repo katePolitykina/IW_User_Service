@@ -28,6 +28,7 @@ jobs:
         with:
           args: >
             -Dsonar.organization=katepolitykina
+            -Dsonar.projectKey=IW_User_Service
   build:
 
     runs-on: ubuntu-latest
