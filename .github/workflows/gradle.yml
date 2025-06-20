@@ -27,7 +27,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.organiation=katepolitykina
+            -Dsonar.organization=katepolitykina
             -Dsonar.projectKey=iw_user_service
   build:
 
