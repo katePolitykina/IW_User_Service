@@ -36,6 +36,17 @@ jobs:
           -Dsonar.organization=katepolitykina
           -Dsonar.projectKey=katePolitykina_IW_User_Service
           -Dsonar.java.binaries=build
+    - name: Build Docker image
+      run: |
+        docker build -t user-service:${{ github.sha }} .
+        mkdir -p docker-image
+        docker save user-service:${{ github.sha }} -o docker-image/user-service.tar
+
+    - name: Upload Docker image artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: user-service-docker-image
+        path: docker-image/user-service.tar
 
   dependency-submission:
     runs-on: ubuntu-latest
