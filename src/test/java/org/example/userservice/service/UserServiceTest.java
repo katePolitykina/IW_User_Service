@@ -5,7 +5,7 @@ import org.example.userservice.dto.UserDTO.UserResponseDTO;
 import org.example.userservice.dto.UserDTO.UserUpdateDTO;
 import org.example.userservice.exception.BadRequestException;
 import org.example.userservice.exception.EntityNotFoundException;
-import org.example.userservice.exception.UserAlreadyExistsExeption;
+import org.example.userservice.exception.UserAlreadyExistsException;
 import org.example.userservice.mapper.UserMapper;
 import org.example.userservice.model.User;
 import org.example.userservice.repository.UserRepository;
@@ -100,7 +100,7 @@ class UserServiceTest {
         UserRequestDTO req = new UserRequestDTO();
         req.setEmail("test@mail.com");
         when(userRepository.existsByEmail("test@mail.com")).thenReturn(true);
-        assertThrows(UserAlreadyExistsExeption.class, () -> userService.create(req));
+        assertThrows(UserAlreadyExistsException.class, () -> userService.create(req));
     }
 
     @Test

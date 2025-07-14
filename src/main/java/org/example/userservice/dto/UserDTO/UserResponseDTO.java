@@ -2,8 +2,6 @@ package org.example.userservice.dto.UserDTO;
 
 import lombok.Data;
 import org.example.userservice.dto.CardDTO.CardResponseDTO;
-import org.mapstruct.Builder;
-import org.springframework.data.redis.core.RedisHash;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

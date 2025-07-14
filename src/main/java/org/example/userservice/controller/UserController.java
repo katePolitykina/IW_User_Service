@@ -10,6 +10,8 @@ import org.example.userservice.dto.UserDTO.UserResponseDTO;
 import org.example.userservice.dto.UserDTO.UserUpdateDTO;
 import org.example.userservice.service.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,19 +40,19 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserResponseDTO create(@RequestBody @Valid UserRequestDTO input) {
-        return userService.create(input);
+    public UserResponseDTO create(@RequestBody @Valid UserRequestDTO input, Authentication authentication) {
+        return userService.create(input, authentication);
 
     }
 
     @PutMapping
-    public UserResponseDTO update(@RequestBody @Valid UserUpdateDTO input) {
-        return userService.update(input);
+    public UserResponseDTO update(@RequestBody @Valid UserUpdateDTO input, Authentication authentication) {
+        return userService.update(input, authentication);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        userService.delete(id);
+    public void delete(@PathVariable Long id, Authentication authentication) {
+        userService.delete(id, authentication);
     }
 
 

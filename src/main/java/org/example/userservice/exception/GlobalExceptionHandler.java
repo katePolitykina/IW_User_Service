@@ -2,42 +2,46 @@ package org.example.userservice.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
 import java.util.Map;
 
 @RestControllerAdvice
-
 public class GlobalExceptionHandler {
-
-    @ExceptionHandler(UserAlreadyExistsExeption.class)
-    public ResponseEntity<Map<String, String>> handleUserAlreadyExists(UserAlreadyExistsExeption ex) {
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(Map.of("message", ex.getMessage()));
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String handleUserAlreadyExists(UserAlreadyExistsException ex) {
+        return ex.getMessage();
     }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidationException(MethodArgumentNotValidException ex) {
-        List<String> errors = ex.getBindingResult().getFieldErrors().stream()
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public List<String> handleValidationException(MethodArgumentNotValidException ex) {
+        return  ex.getBindingResult().getFieldErrors().stream()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .toList();
-
-        return ResponseEntity.badRequest().body(Map.of("errors", errors));
     }
+
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleEntityNotFound(EntityNotFoundException ex) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(Map.of("message", ex.getMessage()));
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleEntityNotFound(EntityNotFoundException ex) {
+        return ex.getMessage();
     }
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<Map<String, String>> handleBadRequest(BadRequestException ex) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("message", ex.getMessage()));
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleBadRequest(BadRequestException ex) {
+        return ex.getMessage();
     }
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String handleAccessDeniedException(AccessDeniedException ex) {
+        return ex.getMessage();
+    }
+
 
 }

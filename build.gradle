@@ -32,10 +32,13 @@ dependencies {
     implementation 'org.junit.jupiter:junit-jupiter:5.8.2'
 
     implementation 'org.liquibase:liquibase-core'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.testcontainers:postgresql'
+    testImplementation 'org.springframework.security:spring-security-test'
 
 
     compileOnly 'org.projectlombok:lombok'
@@ -55,6 +58,8 @@ dependencies {
 
     testImplementation 'org.projectlombok:lombok:1.18.34'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+
+
 }
 
 tasks.named('test') {

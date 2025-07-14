@@ -13,7 +13,10 @@ import org.example.userservice.repository.CardRepository;
 import org.example.userservice.repository.UserRepository;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -26,24 +29,37 @@ public class CardService {
     private final UserRepository userRepository;
     private CacheManager cacheManager;
 
-    public CardResponseDTO getById(Long id) {
-        return cardRepository
+    public CardResponseDTO getById(Long id, Authentication authentication) {
+        Card card = cardRepository
                 .findById(id)
-                .map(cardMapper::toCardResponseTo)
                 .orElseThrow(() -> new EntityNotFoundException("Card with id " + id + " not found"));
+        if (!card.getUser().getEmail().equals(authentication.getName()) ){
+            throw new AccessDeniedException("Access denied");
+        }
+        return cardMapper.toCardResponseTo(card);
     }
 
-    public List<CardResponseDTO> getByIds(List<Long> ids) {
-        return cardRepository
-                .getByIds(ids)
+    public List<CardResponseDTO> getByIds(List<Long> ids, Authentication authentication) {
+        List<Card>  cards = cardRepository.getByIds(ids).toList();
+        boolean allMatch = cards.stream()
+                .allMatch(card -> card.getUser().getEmail().equals(authentication.getName()));
+        if (!allMatch) {
+            throw new AccessDeniedException("Access denied: you can only access your own cards.");
+        }
+
+        return cards.stream()
                 .map(cardMapper::toCardResponseTo)
                 .toList();
     }
 
     @CacheEvict(value = "userWithCards", key = "#input.userId")
-    public CardResponseDTO create(CardRequestDTO input) {
-        User user = userRepository.findById(input.getUserId())
-                .orElseThrow(() -> new BadRequestException("User with id " + input.getUserId() + " does not exist"));
+    public CardResponseDTO create(CardRequestDTO input, Authentication authentication) {
+        User user = userRepository.findUserByEmail(authentication.getName())
+                .orElseThrow(() -> new AccessDeniedException("Access denied: you need to create user before creating cards."));
+
+        if (!user.getId().equals(input.getUserId())) {
+            throw new AccessDeniedException("Access denied: you can only create your own cards.");
+        }
         Card card = cardMapper.toCard(input);
         card.setUser(user);
         Card savedCard = cardRepository.save(card);
@@ -51,10 +67,12 @@ public class CardService {
     }
 
     @Transactional
-    public void delete(Long id) {
+    public void delete(Long id, Authentication authentication) {
         var card = cardRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Card with id " + id + " not found"));
-
+        if (!card.getUser().getEmail().equals(authentication.getName())) {
+            throw new AccessDeniedException("Access denied: you can only delete your own cards.");
+        }
         Long userId = card.getUser().getId();
 
         cardRepository.deleteById(id);
