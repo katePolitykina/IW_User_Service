@@ -136,7 +136,6 @@ class CardServiceTest {
         cardService.delete(99L);
 
         verify(cardRepository).deleteById(99L);
-        // Нет ошибок, evict не вызывается, если кэш отсутствует
     }
 
     @Test
