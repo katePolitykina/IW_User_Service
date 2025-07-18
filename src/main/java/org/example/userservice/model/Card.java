@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.redis.core.RedisHash;
+
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @Entity
@@ -11,10 +14,10 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class Card {
+public class Card implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)

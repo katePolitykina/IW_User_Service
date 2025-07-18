@@ -12,6 +12,7 @@ import org.mapstruct.MappingTarget;
 public interface UserMapper {
     UserResponseDTO toUserResponseTo(User user);
 
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "cards", ignore = true)
     User toUser(UserRequestDTO userRequestDTO);
@@ -22,4 +23,6 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "cards", ignore = true)
     void updateUserFromDto(UserUpdateDTO dto, @MappingTarget User entity);
+
+    UserUpdateDTO toUserUpdateDTO(User user);
 }
