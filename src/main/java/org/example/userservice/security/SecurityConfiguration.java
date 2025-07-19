@@ -17,8 +17,6 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/v1.0/users").hasAuthority("ROLE_iw.admin")
-                        .requestMatchers("/api/v1.0/cards").hasAuthority("ROLE_iw.admin")
                         .requestMatchers( "/api/v1.0/cards/**","/api/v1.0/users/**" ).authenticated()
                         .anyRequest().authenticated()
                 )
