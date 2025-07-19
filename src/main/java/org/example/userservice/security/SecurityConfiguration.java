@@ -12,29 +12,27 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfiguration {
-    @Value("${auth.jwks-uri}")
-    private String jwksUri;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/actuator").permitAll()
-                        .requestMatchers("/api/v1.0/users/**", "/api/v1.0/cards/**").authenticated()
+                        .requestMatchers("/api/v1.0/users").hasAuthority("ROLE_iw.admin")
+                        .requestMatchers("/api/v1.0/cards").hasAuthority("ROLE_iw.admin")
+                        .requestMatchers( "/api/v1.0/cards/**","/api/v1.0/users/**" ).authenticated()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
-                                .jwkSetUri(jwksUri)
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         )
-                )
-                .csrf(AbstractHttpConfigurer::disable);
+                );
         return http.build();
     }
     private JwtAuthenticationConverter jwtAuthenticationConverter() {
         var converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(new KeycloakJwtAuthenticationConverter());
-        return new JwtAuthenticationConverter();
+        return converter;
     }
-    }
+}
 

@@ -32,6 +32,7 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
     }
 
+    @Transactional
     public List<UserResponseDTO> getByIds(List<Long> ids) {
         return userRepository
                 .getByIds(ids)
