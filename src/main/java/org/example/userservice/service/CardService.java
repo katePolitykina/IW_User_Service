@@ -13,6 +13,7 @@ import org.example.userservice.repository.CardRepository;
 import org.example.userservice.repository.UserRepository;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -26,13 +27,14 @@ public class CardService {
     private final UserRepository userRepository;
     private CacheManager cacheManager;
 
+    @PreAuthorize("@securityService.isCardOwnerOrAdmin(#id, authentication)")
     public CardResponseDTO getById(Long id) {
         return cardRepository
                 .findById(id)
                 .map(cardMapper::toCardResponseTo)
                 .orElseThrow(() -> new EntityNotFoundException("Card with id " + id + " not found"));
     }
-
+    @PreAuthorize("hasRole('ROLE_iw.admin')")
     public List<CardResponseDTO> getByIds(List<Long> ids) {
         return cardRepository
                 .getByIds(ids)
@@ -41,6 +43,7 @@ public class CardService {
     }
 
     @CacheEvict(value = "userWithCards", key = "#input.userId")
+    @PreAuthorize("@securityService.isOwnerByEmailOrAdmin(#input.userId, authentication)")
     public CardResponseDTO create(CardRequestDTO input) {
         User user = userRepository.findById(input.getUserId())
                 .orElseThrow(() -> new BadRequestException("User with id " + input.getUserId() + " does not exist"));
@@ -51,7 +54,9 @@ public class CardService {
     }
 
     @Transactional
+    @PreAuthorize("@securityService.isCardOwnerOrAdmin(#id, authentication)")
     public void delete(Long id) {
+
         var card = cardRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Card with id " + id + " not found"));
 
