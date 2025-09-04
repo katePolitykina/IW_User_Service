@@ -1,6 +1,5 @@
 package org.example.userservice.dto.UserDTO;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
@@ -26,8 +25,4 @@ public class UserUpdateDTO {
     @NotNull
     @Past
     private LocalDate birthDate;
-
-    @NotNull
-    @Email
-    private String email;
 }

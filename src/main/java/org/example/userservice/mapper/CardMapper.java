@@ -17,6 +17,9 @@ public abstract class CardMapper {
     public abstract CardResponseDTO toCardResponseTo(Card card);
 
     public abstract Card toCard(CardRequestDTO cardRequestDTO);
+    public Long toId(Card card) {
+        return card == null ? null : card.getId();
+    }
 
     protected String map(byte[] value) {
         return encryptionService.decrypt(value);

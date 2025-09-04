@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
+import org.example.userservice.dto.UserDTO.PublicUserDTO;
 import org.example.userservice.dto.UserDTO.UserRequestDTO;
 import org.example.userservice.dto.UserDTO.UserResponseDTO;
 import org.example.userservice.dto.UserDTO.UserUpdateDTO;
@@ -51,6 +52,16 @@ public class UserController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         userService.delete(id);
+    }
+
+    @GetMapping("/internal/by-email")
+    public PublicUserDTO getInternalUserData (@RequestParam @NotBlank String email) {
+        return userService.getInternalUserData(email);
+    }
+
+    @GetMapping("/internal/by-id")
+    public PublicUserDTO getInternalUserDataById(@RequestParam @NotNull Long id) {
+        return userService.getInternalUserData(id);
     }
 
 

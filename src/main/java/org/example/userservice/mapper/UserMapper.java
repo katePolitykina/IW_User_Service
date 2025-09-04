@@ -1,5 +1,6 @@
 package org.example.userservice.mapper;
 
+import org.example.userservice.dto.UserDTO.PublicUserDTO;
 import org.example.userservice.dto.UserDTO.UserRequestDTO;
 import org.example.userservice.dto.UserDTO.UserResponseDTO;
 import org.example.userservice.dto.UserDTO.UserUpdateDTO;
@@ -10,19 +11,16 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring", uses = CardMapper.class)
 public interface UserMapper {
+    @Mapping(target = "cardsIds", source = "cards")
     UserResponseDTO toUserResponseTo(User user);
 
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "cards", ignore = true)
     User toUser(UserRequestDTO userRequestDTO);
-
-    @Mapping(target = "cards", ignore = true)
-    User toUser(UserUpdateDTO userUpdateDTO);
-
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "cards", ignore = true)
     void updateUserFromDto(UserUpdateDTO dto, @MappingTarget User entity);
 
-    UserUpdateDTO toUserUpdateDTO(User user);
+    PublicUserDTO toInternalUserDTO(User user);
 }

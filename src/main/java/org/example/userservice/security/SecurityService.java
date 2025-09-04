@@ -2,51 +2,33 @@ package org.example.userservice.security;
 
 
 import lombok.RequiredArgsConstructor;
-import org.example.userservice.repository.CardRepository;
-import org.example.userservice.repository.UserRepository;
-import org.springframework.security.core.Authentication;
+import lombok.extern.slf4j.Slf4j;
+import org.example.userservice.exception.ForbiddenException;
 import org.springframework.stereotype.Component;
-import org.springframework.security.oauth2.jwt.Jwt;
 
-@Component("securityService")
+import java.util.Arrays;
+
+@Component
+@Slf4j
 @RequiredArgsConstructor
 public class SecurityService {
-    private final UserRepository userRepository;
-    private final CardRepository cardRepository;
+    private final AuthInfo authInfo;
 
-    public boolean isOwnerByEmailOrAdmin(Long userId, Authentication authentication) {
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-        String emailFromToken = jwt.getClaimAsString("email");
-
-        var roles = jwt.getClaimAsStringList("roles");
-        if (roles != null && roles.contains("ROLE_iw.admin")) {
-            return true;
+    public boolean isOwner(Long userId) {
+        
+        if (authInfo.getUserId() == null) {
+            throw new ForbiddenException("Missing authentication headers");
         }
-
-        return userRepository.findById(userId)
-                .map(user -> user.getEmail().equals(emailFromToken))
-                .orElse(false);
+        log.warn("Checking if owner of user {}", authInfo.getUserId());
+        return userId.equals(authInfo.getUserId());
     }
 
-    public boolean isOwnerByEmailOrAdmin(String userEmail, Authentication authentication) {
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-        String emailFromToken = jwt.getClaimAsString("email");
-
-        var roles = jwt.getClaimAsStringList("roles");
-        if (roles != null && roles.contains("ROLE_iw.admin")) {
-            return true;
+    public boolean hasRole(String role) {
+        if (authInfo.getRoles() == null || authInfo.getRoles().isEmpty()) {
+            return false;
         }
-        return userEmail.equals(emailFromToken);
-    }
-    public boolean isCardOwnerOrAdmin(Long cardId, Authentication authentication) {
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-        String emailFromToken = jwt.getClaimAsString("email");
-
-        var roles = jwt.getClaimAsStringList("roles");
-        if (roles != null && roles.contains("ROLE_iw.admin")) {
-            return true;
-        }
-        return cardRepository.findById(cardId).map(card -> card.getUser().getEmail().equals(emailFromToken))
-                .orElse(false);
+        return Arrays.asList(authInfo.getRoles().split(","))
+                .stream()
+                .anyMatch(r -> r.trim().equals(role));
     }
 }

@@ -10,10 +10,6 @@ public class CardRequestDTO {
     @Pattern(regexp = "^\\d{16}$", message = "Card number must be exactly 16 digits")
     private String number;
 
-    @NotNull
-    @Positive
-    private Long userId;
-
     @Size(min = 2, max = 255, message = "Card holder name must be between 2 and 255 characters")
     private String holder;
 
