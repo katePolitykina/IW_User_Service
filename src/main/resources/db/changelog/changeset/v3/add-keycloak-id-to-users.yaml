@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-keycloak-id-to-users
+      author: katapalk
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: keycloak_id
+                  type: varchar(36)
+                  constraints:
+                    nullable: false
+                    unique: true
+        - createIndex:
+            indexName: idx_users_on_keycloak_id
+            tableName: users
+            columns:
+              - column:
+                  name: keycloak_id

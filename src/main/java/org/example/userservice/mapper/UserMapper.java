@@ -1,5 +1,6 @@
 package org.example.userservice.mapper;
 
+import org.example.userservice.dto.UserDTO.PublicUserDTO;
 import org.example.userservice.dto.UserDTO.UserRequestDTO;
 import org.example.userservice.dto.UserDTO.UserResponseDTO;
 import org.example.userservice.dto.UserDTO.UserUpdateDTO;
@@ -25,4 +26,6 @@ public interface UserMapper {
     void updateUserFromDto(UserUpdateDTO dto, @MappingTarget User entity);
 
     UserUpdateDTO toUserUpdateDTO(User user);
+
+    PublicUserDTO toInternalUserDTO(User user);
 }

@@ -2,10 +2,10 @@ package org.example.userservice.service;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.example.userservice.dto.UserDTO.PublicUserDTO;
 import org.example.userservice.dto.UserDTO.UserRequestDTO;
 import org.example.userservice.dto.UserDTO.UserResponseDTO;
 import org.example.userservice.dto.UserDTO.UserUpdateDTO;
-import org.example.userservice.exception.BadRequestException;
 import org.example.userservice.exception.EntityNotFoundException;
 import org.example.userservice.exception.UserAlreadyExistsExeption;
 import org.example.userservice.mapper.UserMapper;
@@ -13,7 +13,6 @@ import org.example.userservice.model.User;
 import org.example.userservice.repository.UserRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +25,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     @Cacheable(value = "userWithCards", key = "#id")
-    @PreAuthorize("@securityService.isOwnerByEmailOrAdmin(#id, authentication)")
+    @PreAuthorize("@securityService.isOwnerByIdOrAdmin(#id, authentication)")
     public UserResponseDTO getById(Long id) {
         return userRepository
                 .findById(id)
@@ -52,7 +51,6 @@ public class UserService {
     }
 
     @CacheEvict(value = "userWithCards", key = "#result.id")
-    @PreAuthorize("@securityService.isOwnerByEmailOrAdmin(#input.email, authentication)")
     public UserResponseDTO create(UserRequestDTO input) {
         if (userRepository.existsByEmail(input.getEmail())) {
             throw new UserAlreadyExistsExeption("User with email " + input.getEmail() + " already exists");
@@ -63,7 +61,7 @@ public class UserService {
     }
     @CacheEvict(value = "userWithCards", key = "#id")
     @Transactional
-    @PreAuthorize("@securityService.isOwnerByEmailOrAdmin(#id, authentication)")
+    @PreAuthorize("@securityService.isOwnerByIdOrAdmin(#id, authentication)")
     public void delete(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
@@ -73,13 +71,11 @@ public class UserService {
     }
     @CacheEvict(value = "userWithCards", key = "#input.id")
     @Transactional
-    @PreAuthorize("@securityService.isOwnerByEmailOrAdmin(#input.email, authentication)")
+    @PreAuthorize("@securityService.isOwnerByIdOrAdmin(#input.id, authentication)")
     public UserResponseDTO update(UserUpdateDTO input) {
         User user = userRepository.findById(input.getId())
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + input.getId() + " not found"));
-        if (userRepository.existsByEmailAndIdNot(input.getEmail(), input.getId())) {
-            throw new BadRequestException("Email \"" + input.getEmail() + "\" is already in use.");
-        }
+
         userMapper.updateUserFromDto(input, user);
 
         User updatedUser = userRepository.save(user);
@@ -87,4 +83,16 @@ public class UserService {
     }
 
 
+    public PublicUserDTO getInternalUserData(String email) {
+        return userRepository
+                .findUserByEmail(email)
+                .map(userMapper::toInternalUserDTO)
+                .orElseThrow(() -> new EntityNotFoundException("User with email " + email + " not found"));
+    }
+    public PublicUserDTO getInternalUserData(Long id) {
+        return userRepository
+                .findById(id)
+                .map(userMapper::toInternalUserDTO)
+                .orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
+    }
 }

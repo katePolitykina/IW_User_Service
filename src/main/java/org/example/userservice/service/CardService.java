@@ -13,6 +13,7 @@ import org.example.userservice.repository.CardRepository;
 import org.example.userservice.repository.UserRepository;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
+//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -43,7 +44,7 @@ public class CardService {
     }
 
     @CacheEvict(value = "userWithCards", key = "#input.userId")
-    @PreAuthorize("@securityService.isOwnerByEmailOrAdmin(#input.userId, authentication)")
+    @PreAuthorize("@securityService.isOwnerByIdOrAdmin(#input.userId, authentication)")
     public CardResponseDTO create(CardRequestDTO input) {
         User user = userRepository.findById(input.getUserId())
                 .orElseThrow(() -> new BadRequestException("User with id " + input.getUserId() + " does not exist"));
