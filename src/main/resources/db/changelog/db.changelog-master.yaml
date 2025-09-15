@@ -9,6 +9,3 @@ databaseChangeLog:
   - include:
       file: changeset/v2/v2-add-card-index.yaml
       relativeToChangelogFile: true
-  - include:
-        file: changeset/v3/add-keycloak-id-to-users.yaml
-        relativeToChangelogFile: true

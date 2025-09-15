@@ -22,7 +22,7 @@ services:
       - redis
     networks:
       - userservice_net
-      - iw_authenticationservice_keycloak_net
+      - keycloak_net
 
   db:
     image: postgres:latest
@@ -51,6 +51,6 @@ volumes:
 
 networks:
   userservice_net:
-  iw_authenticationservice_keycloak_net :
+  keycloak_net :
     external: true
 
