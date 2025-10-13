@@ -15,8 +15,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class UserRequestDTO {
     @NotNull @NotEmpty
-    private String keycloakId;
-    @NotNull @NotEmpty
     private String name;
     @NotNull @NotEmpty
     private String surname;

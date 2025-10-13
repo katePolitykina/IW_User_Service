@@ -42,6 +42,7 @@ public class CardService {
 
         return cardMapper.toCardResponseTo(card);
     }
+    @Transactional
     public List<CardResponseDTO> getByIds(List<Long> ids) {
 
         return cardRepository

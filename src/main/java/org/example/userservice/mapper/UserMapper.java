@@ -20,6 +20,7 @@ public interface UserMapper {
     User toUser(UserRequestDTO userRequestDTO);
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "cards", ignore = true)
+    @Mapping(target = "email", ignore = true)
     void updateUserFromDto(UserUpdateDTO dto, @MappingTarget User entity);
 
     PublicUserDTO toInternalUserDTO(User user);
